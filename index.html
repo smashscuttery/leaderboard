@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scuttery World Cup Raffle — Leaderboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green:  #1a6b3c;
+      --gold:   #d4a843;
+      --silver: #9eaab5;
+      --bronze: #c07a47;
+      --bg:     #0e1a13;
+      --card:   #162118;
+      --border: #243528;
+      --text:   #e8f0ea;
+      --muted:  #6b8870;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      padding: 48px 20px 80px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg, transparent, transparent 38px,
+        rgba(255,255,255,.012) 38px, rgba(255,255,255,.012) 40px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+    .wrapper { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 48px; }
+    .badge {
+      display: inline-block; background: var(--green); color: #fff;
+      font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+      letter-spacing: 3px; padding: 5px 14px; border-radius: 2px;
+      margin-bottom: 14px; opacity: .85;
+    }
+    h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(42px,9vw,72px); line-height: .95; letter-spacing: 2px; color: #fff; }
+    h1 span { color: var(--gold); }
+    .subtitle { margin-top: 12px; font-size: 14px; color: var(--muted); letter-spacing: .5px; }
+    .countries { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .country-pill {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(0,0,0,.25); border: 1px solid var(--border);
+      border-radius: 20px; padding: 3px 9px 3px 7px;
+      font-size: 11px; color: var(--text); white-space: nowrap;
+    }
+    .country-pill .flag { font-size: 13px; line-height: 1; }
+    .country-pill .cp-pts {
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
+      color: var(--gold); margin-left: 4px; letter-spacing: .5px;
+    }
+    .podium { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+    .podium-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px 16px 16px; text-align: center;
+      position: relative; overflow: hidden;
+      animation: fadeUp .5s ease both;
+    }
+    .podium-card:nth-child(1) { animation-delay: .05s; }
+    .podium-card:nth-child(2) { animation-delay: .10s; }
+    .podium-card:nth-child(3) { animation-delay: .15s; }
+    .podium-card.first { border-color: var(--gold); background: linear-gradient(160deg,#1e2c1f,#1a2820); }
+    .podium-card.first::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold); }
+    .medal { font-size: 24px; margin-bottom: 6px; display: block; }
+    .podium-name { font-size: 14px; font-weight: 600; color: #fff; }
+    .podium-pts { margin-top: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; }
+    .podium-card.first  .podium-pts { color: var(--gold); }
+    .podium-card.second .podium-pts { color: var(--silver); }
+    .podium-card.third  .podium-pts { color: var(--bronze); }
+    .pts-label { font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:2px; color:var(--muted); display:block; margin-top:-2px; }
+    .podium-card .countries { justify-content: center; margin-top: 12px; }
+    .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); padding: 14px 20px; text-align: left;
+      border-bottom: 1px solid var(--border); font-weight: 500;
+    }
+    thead th.right { text-align: right; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; animation: fadeUp .45s ease both; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,.03); }
+    td { padding: 14px 20px; font-size: 14px; vertical-align: top; }
+    .rank-num { font-family:'Bebas Neue',sans-serif; font-size:18px; color:var(--muted); width:40px; padding-top:16px; }
+    .name { font-weight: 600; color: #fff; padding-top: 2px; }
+    .points { text-align:right; font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--gold); letter-spacing:.5px; white-space:nowrap; padding-top:14px; }
+    .pts-unit { font-family:'DM Sans',sans-serif; font-size:11px; color:var(--muted); margin-left:3px; letter-spacing:1px; }
+    footer { text-align:center; margin-top:36px; font-size:12px; color:var(--muted); letter-spacing:.5px; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    @media (max-width:560px) {
+      .podium { grid-template-columns: 1fr; }
+      .podium-card .countries { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <div class="badge">Scuttery World Cup</div>
+    <h1>Raffle <span>Leaderboard</span></h1>
+  </header>
+  <div class="podium" id="podium"></div>
+  <div class="table-wrap" id="table-wrap" style="display:none">
+    <table>
+      <thead><tr><th>#</th><th>Participant &amp; Teams</th><th class="right">Points</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <footer>Last updated: June 2026</footer>
+</div>
+
+<script>
+// =====================================================================
+//  EDIT THIS DATA — that's all you need to do!
+//
+//  Each entry = one participant.
+//  Give them a name and their countries.
+//  Update pts: numbers as scores change — everything else is automatic.
+// =====================================================================
+const PLAYERS = [
+  {
+    name: "Brendan",
+    countries: [
+      { flag: "🇧🇦", name: "Bosnia & Herzegovina", pts: 0 },
+      { flag: "🇵🇦", name: "Panama",               pts: 0 },
+      { flag: "🇨🇴", name: "Colombia",              pts: 0 },
+      { flag: "🇩🇪", name: "Germany",               pts: 0 },
+    ]
+  },
+  {
+    name: "Camryn",
+    countries: [
+      { flag: "🇯🇴", name: "Jordan",  pts: 0 },
+      { flag: "🇩🇿", name: "Algeria", pts: 0 },
+      { flag: "🇮🇷", name: "Iran",    pts: 0 },
+      { flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "England", pts: 0 },
+    ]
+  },
+  {
+    name: "Lochlann",
+    countries: [
+      { flag: "🇹🇳", name: "Tunisia",   pts: 0 },
+      { flag: "🇦🇺", name: "Australia", pts: 0 },
+      { flag: "🇺🇾", name: "Uruguay",   pts: 0 },
+      { flag: "🇧🇷", name: "Brazil",    pts: 0 },
+    ]
+  },
+  {
+    name: "Jack",
+    countries: [
+      { flag: "🇶🇦", name: "Qatar",    pts: 0 },
+      { flag: "🇵🇾", name: "Paraguay", pts: 0 },
+      { flag: "🇯🇵", name: "Japan",    pts: 0 },
+      { flag: "🇫🇷", name: "France",   pts: 0 },
+    ]
+  },
+  {
+    name: "Calla",
+    countries: [
+      { flag: "🇺🇿", name: "Uzbekistan", pts: 0 },
+      { flag: "🇨🇦", name: "Canada",     pts: 0 },
+      { flag: "🇦🇹", name: "Austria",    pts: 0 },
+      { flag: "🇦🇷", name: "Argentina",  pts: 0 },
+    ]
+  },
+  {
+    name: "Aodhan",
+    countries: [
+      { flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", name: "Scotland",    pts: 0 },
+      { flag: "🇪🇬", name: "Egypt",       pts: 0 },
+      { flag: "🇲🇽", name: "Mexico",      pts: 0 },
+      { flag: "🇳🇱", name: "Netherlands", pts: 0 },
+    ]
+  },
+  {
+    name: "Paul",
+    countries: [
+      { flag: "🇨🇻", name: "Cape Verde", pts: 0 },
+      { flag: "🇸🇪", name: "Sweden",     pts: 0 },
+      { flag: "🇺🇸", name: "USA",        pts: 0 },
+      { flag: "🇪🇸", name: "Spain",      pts: 0 },
+    ]
+  },
+  {
+    name: "Sean",
+    countries: [
+      { flag: "🇨🇩", name: "DR Congo",  pts: 0 },
+      { flag: "🇨🇮", name: "Ivory Coast", pts: 0 },
+      { flag: "🇪🇨", name: "Ecuador",   pts: 0 },
+      { flag: "🇲🇦", name: "Morocco",   pts: 0 },
+    ]
+  },
+  {
+    name: "Alex",
+    countries: [
+      { flag: "🇸🇦", name: "Saudi Arabia", pts: 0 },
+      { flag: "🇰🇷", name: "South Korea",  pts: 0 },
+      { flag: "🇸🇳", name: "Senegal",      pts: 0 },
+      { flag: "🇭🇷", name: "Croatia",      pts: 0 },
+    ]
+  },
+  {
+    name: "Oisin",
+    countries: [
+      { flag: "🇮🇶", name: "Iraq",    pts: 0 },
+      { flag: "🇨🇿", name: "Czechia", pts: 0 },
+      { flag: "🇨🇭", name: "Switzerland", pts: 0 },
+      { flag: "🇵🇹", name: "Portugal",    pts: 0 },
+    ]
+  },
+  {
+    name: "Conor",
+    countries: [
+      { flag: "🇿🇦", name: "South Africa", pts: 0 },
+      { flag: "🇳🇴", name: "Norway",       pts: 0 },
+      { flag: "🇹🇷", name: "Turkey",       pts: 0 },
+      { flag: "🇧🇪", name: "Belgium",      pts: 0 },
+    ]
+  },
+  {
+    name: "Derek",
+    countries: [
+      { flag: "🇬🇭", name: "Ghana",       pts: 0 },
+      { flag: "🇭🇹", name: "Haiti",       pts: 0 },
+      { flag: "🇨🇼", name: "Curaçao",     pts: 0 },
+      { flag: "🇳🇿", name: "New Zealand", pts: 0 },
+    ]
+  },
+];
+// =====================================================================
+//  END OF DATA — nothing below needs to be changed
+// =====================================================================
+
+function totalPts(player) {
+  return player.countries.reduce((s, c) => s + c.pts, 0);
+}
+
+function pillsHTML(countries) {
+  return countries.map(c =>
+    `<div class="country-pill">
+      <span class="flag">${c.flag}</span> ${c.name}
+      <span class="cp-pts">+${c.pts}</span>
+    </div>`
+  ).join('');
+}
+
+const sorted = [...PLAYERS].sort((a, b) => totalPts(b) - totalPts(a));
+
+const medals  = ['🥇','🥈','🥉'];
+const classes = ['first','second','third'];
+const podium  = document.getElementById('podium');
+
+sorted.slice(0, 3).forEach((p, i) => {
+  const total = totalPts(p);
+  podium.innerHTML += `
+    <div class="podium-card ${classes[i]}">
+      <span class="medal">${medals[i]}</span>
+      <div class="podium-name">${p.name}</div>
+      <div class="podium-pts">${total}</div>
+      <span class="pts-label">pts</span>
+      <div class="countries">${pillsHTML(p.countries)}</div>
+    </div>`;
+});
+
+const tbody = document.getElementById('tbody');
+const rest  = sorted.slice(3);
+
+if (rest.length > 0) {
+  document.getElementById('table-wrap').style.display = '';
+  rest.forEach((p, i) => {
+    const rank  = i + 4;
+    const total = totalPts(p);
+    const delay = (0.20 + i * 0.04).toFixed(2);
+    tbody.innerHTML += `
+      <tr style="animation-delay:${delay}s">
+        <td class="rank-num">${rank}</td>
+        <td>
+          <div class="name">${p.name}</div>
+          <div class="countries">${pillsHTML(p.countries)}</div>
+        </td>
+        <td class="points">${total} <span class="pts-unit">pts</span></td>
+      </tr>`;
+  });
+}
+</script>
+</body>
+</html>
