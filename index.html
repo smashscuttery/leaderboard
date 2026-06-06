@@ -3,489 +3,319 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scuttery World Cup Raffle</title>
-  <meta name="theme-color" content="#04080f" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <title>Scuttery World Cup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:      #04080f;
-      --gold:    #ffd700;
-      --gold2:   #ffaa00;
-      --silver:  #c0cfe0;
-      --bronze:  #cd7f32;
-      --green:   #00e676;
-      --cyan:    #00e5ff;
-      --red:     #ff1744;
-      --card:    rgba(255,255,255,.04);
-      --border:  rgba(255,255,255,.08);
-      --text:    #f0f4ff;
-      --muted:   rgba(255,255,255,.35);
+      --muted:  rgba(255,255,255,.3);
+      --gold:   #ffd700;
+      --silver: #c0cfe0;
+      --bronze: #cd7f32;
+      --green:  #3fb950;
+      --yellow: #d29922;
+      --red:    #f85149;
     }
 
-    html { background: var(--bg); }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
+    html, body {
+      background: #04070f;
+      color: #e6edf3;
       font-family: 'Rajdhani', sans-serif;
-      min-height: 100vh;
-      padding: 0 0 100px;
-      overflow-x: hidden;
-      /* stars canvas is absolute inside this */
-      position: relative;
+      padding: 48px 20px 80px;
     }
 
-    /* ── Star field — absolute so it scrolls with the page, no jump on mobile ── */
-    #stars-canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      /* height set by JS */
+    #bg {
+      position: fixed;
+      inset: 0;
       z-index: 0;
       pointer-events: none;
     }
 
-    .wrapper {
-      position: relative;
-      z-index: 1;
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
+    .wrapper { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; }
 
     /* ── Header ── */
-    header {
-      text-align: center;
-      padding: 70px 0 52px;
-      position: relative;
-    }
+    header { text-align: center; margin-bottom: 48px; }
+    .trophy { font-size: 52px; margin-bottom: 8px; display: inline-block; animation: trophyPulse 3s ease-in-out infinite; }
 
-    .trophy {
-      font-size: 56px;
-      display: block;
-      margin-bottom: 8px;
-      animation: trophyBob 3s ease-in-out infinite;
-      filter: drop-shadow(0 0 20px rgba(255,215,0,.6));
+    @keyframes trophyPulse {
+      0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 0px rgba(255,215,0,0)); }
+      50%       { transform: scale(1.12); filter: drop-shadow(0 0 14px rgba(255,215,0,.7)); }
     }
-    @keyframes trophyBob {
-      0%,100% { transform: translateY(0) rotate(-3deg); }
-      50%      { transform: translateY(-10px) rotate(3deg); }
-    }
-
-    .event-tag {
-      font-size: 11px;
-      letter-spacing: 6px;
-      text-transform: uppercase;
-      color: var(--cyan);
-      margin-bottom: 10px;
-      opacity: 0;
-      animation: fadeSlideDown .6s .2s ease forwards;
-    }
-
-    h1 {
+    header h1 {
       font-family: 'Anton', sans-serif;
-      font-size: clamp(54px, 13vw, 110px);
-      line-height: .88;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      opacity: 0;
-      animation: fadeSlideDown .7s .35s ease forwards;
-    }
-    h1 .line1 {
-      display: block;
-      background: linear-gradient(135deg, #fff 0%, #aac4ff 100%);
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    h1 .line2 {
-      display: block;
-      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 60%, #ff6f00 100%);
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 18px rgba(255,180,0,.5));
-    }
-
-    .subtitle {
-      margin-top: 14px;
-      font-size: 13px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--muted);
-      opacity: 0;
-      animation: fadeSlideDown .6s .5s ease forwards;
-    }
-
-    .divider {
-      width: 120px; height: 2px;
-      margin: 24px auto;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      opacity: 0;
-      animation: fadeIn .8s .65s ease forwards;
-    }
-
-    /* ── Countdown ── */
-    .countdown-wrap {
-      opacity: 0;
-      animation: fadeIn .8s .8s ease forwards;
-      margin: 0 auto 48px;
-      max-width: 500px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 12px;
-      padding: 18px 20px 16px;
-      text-align: center;
-    }
-    .countdown-label {
-      font-size: 10px;
+      font-size: clamp(52px, 12vw, 96px);
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: var(--cyan);
-      margin-bottom: 12px;
-    }
-    .countdown-label .match {
-      color: var(--muted);
-      font-size: 10px;
-      letter-spacing: 2px;
-      display: block;
-      margin-top: 3px;
-    }
-    .countdown-digits {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-    .cd-unit {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: 54px;
-    }
-    .cd-num {
-      font-family: 'Anton', sans-serif;
-      font-size: 40px;
       line-height: 1;
-      letter-spacing: 2px;
-      color: #fff;
-      background: rgba(0,0,0,.3);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 8px;
-      width: 100%;
-      padding: 8px 4px 6px;
-      text-align: center;
-      transition: color .3s;
     }
-    .cd-unit:first-child .cd-num { color: var(--gold); text-shadow: 0 0 14px rgba(255,215,0,.4); }
-    .cd-sep {
-      font-family: 'Anton', sans-serif;
-      font-size: 30px;
-      color: var(--muted);
-      padding-top: 10px;
-      align-self: flex-start;
+    header h1 span {
+      background: linear-gradient(180deg, #ffd700 0%, #ff8c00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 24px rgba(255,165,0,.5)) drop-shadow(0 0 60px rgba(255,140,0,.2));
     }
-    .cd-lbl {
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 5px;
-    }
-    .countdown-wrap.started .countdown-digits { display: none; }
-    .countdown-wrap.started .cd-started {
+    /* glowing underline */
+    header::after {
+      content: '';
       display: block;
-      font-family: 'Anton', sans-serif;
-      font-size: 22px;
-      letter-spacing: 2px;
-      color: var(--green);
-      text-shadow: 0 0 16px rgba(0,230,118,.5);
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    .cd-started { display: none; }
-    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.5;} }
-
-    /* ── Country pills ── */
-    .countries { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
-
-    .country-pill {
-      display: flex; align-items: center; gap: 4px;
-      border-radius: 3px;
-      padding: 3px 8px 3px 6px;
-      font-size: 11px; font-weight: 500; letter-spacing: .5px;
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.1);
-      transition: filter .2s;
-      position: relative;
-    }
-    .country-pill:hover { filter: brightness(1.2); }
-    .country-pill .flag { font-size: 13px; line-height: 1; }
-    .country-pill .cp-pts {
-      font-family: 'Anton', sans-serif;
-      font-size: 13px;
-      margin-left: 5px;
-      letter-spacing: 1px;
-    }
-    /* heat colours set by JS via inline style */
-    .country-pill.heat-high  { background: rgba(0,230,118,.12);  border-color: rgba(0,230,118,.3);  }
-    .country-pill.heat-high  .cp-pts { color: #00e676; }
-    .country-pill.heat-mid   { background: rgba(255,214,0,.10);  border-color: rgba(255,214,0,.25); }
-    .country-pill.heat-mid   .cp-pts { color: var(--gold); }
-    .country-pill.heat-low   { background: rgba(255,82,82,.10);  border-color: rgba(255,82,82,.25); }
-    .country-pill.heat-low   .cp-pts { color: #ff5252; }
-    .country-pill.heat-zero  { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.08); }
-    .country-pill.heat-zero  .cp-pts { color: var(--muted); }
-
-    /* 🔥 hottest country badge */
-    .country-pill.on-fire::after {
-      content: '🔥';
-      font-size: 11px;
-      margin-left: 3px;
-      line-height: 1;
+      width: 80px;
+      height: 3px;
+      margin: 16px auto 0;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
     }
 
     /* ── Podium ── */
     .podium {
       display: grid;
-      grid-template-columns: 1fr 1.08fr 1fr;
-      gap: 14px;
-      margin-bottom: 28px;
-      align-items: end;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: stretch;
     }
+
+    .podium-card { order: 1; }
+    .podium-card.first  { order: 0; }
+    .podium-card.third  { order: 2; }
 
     .podium-card {
-      border-radius: 12px;
-      padding: 24px 16px 20px;
+      border-radius: 16px;
+      padding: 28px 16px 22px;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid;
       position: relative;
       overflow: hidden;
-      cursor: default;
-      transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s;
-      opacity: 0;
-      animation: riseUp .7s ease forwards;
+      transition: transform .2s ease;
     }
-    .podium-card:nth-child(1) { animation-delay: .8s; }
-    .podium-card:nth-child(2) { animation-delay: .65s; }
-    .podium-card:nth-child(3) { animation-delay: .95s; }
-    .podium-card:hover { transform: translateY(-6px) scale(1.02); }
+    .podium-card:hover { transform: translateY(-4px); }
 
+    /* top-edge colour bar */
     .podium-card::before {
       content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.1) 0%, rgba(255,255,255,.02) 100%);
-      border-radius: inherit;
-      pointer-events: none;
-    }
-
-    /* gold card + pulsing glow */
-    .podium-card.first {
-      background: linear-gradient(160deg, rgba(255,215,0,.12) 0%, rgba(255,120,0,.06) 100%);
-      border: 1px solid rgba(255,215,0,.4);
-      box-shadow: 0 0 40px rgba(255,215,0,.15), 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.15);
-      animation: riseUp .7s .8s ease forwards, pulseGold 3s 1.5s ease-in-out infinite;
-    }
-    @keyframes pulseGold {
-      0%,100% { box-shadow: 0 0 30px rgba(255,215,0,.15), 0 20px 60px rgba(0,0,0,.5); }
-      50%      { box-shadow: 0 0 65px rgba(255,215,0,.35), 0 20px 60px rgba(0,0,0,.5); }
-    }
-
-    /* silver card + pulsing glow */
-    .podium-card.second {
-      background: linear-gradient(160deg, rgba(192,207,224,.1) 0%, rgba(100,130,160,.04) 100%);
-      border: 1px solid rgba(192,207,224,.25);
-      box-shadow: 0 0 30px rgba(192,207,224,.08), 0 16px 50px rgba(0,0,0,.45);
-      animation: riseUp .7s .65s ease forwards, pulseSilver 3.5s 1.5s ease-in-out infinite;
-    }
-    @keyframes pulseSilver {
-      0%,100% { box-shadow: 0 0 20px rgba(192,207,224,.08), 0 16px 50px rgba(0,0,0,.45); }
-      50%      { box-shadow: 0 0 50px rgba(192,207,224,.25), 0 16px 50px rgba(0,0,0,.45); }
-    }
-
-    /* bronze card + pulsing glow */
-    .podium-card.third {
-      background: linear-gradient(160deg, rgba(205,127,50,.1) 0%, rgba(140,80,20,.05) 100%);
-      border: 1px solid rgba(205,127,50,.25);
-      box-shadow: 0 0 30px rgba(205,127,50,.08), 0 16px 50px rgba(0,0,0,.45);
-      animation: riseUp .7s .95s ease forwards, pulseBronze 4s 1.5s ease-in-out infinite;
-    }
-    @keyframes pulseBronze {
-      0%,100% { box-shadow: 0 0 20px rgba(205,127,50,.08), 0 16px 50px rgba(0,0,0,.45); }
-      50%      { box-shadow: 0 0 50px rgba(205,127,50,.28), 0 16px 50px rgba(0,0,0,.45); }
-    }
-
-    /* shimmer on 1st */
-    .podium-card.first::after {
-      content: '';
       position: absolute;
-      top: 0; left: -100%; width: 60%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent);
-      animation: shimmer 3.5s 1.5s ease-in-out infinite;
+      top: 0; left: 0; right: 0;
+      height: 3px;
     }
-    @keyframes shimmer { 0%{left:-60%;} 100%{left:160%;} }
 
-    .medal {
-      font-size: 30px; display: block; margin-bottom: 8px;
-      filter: drop-shadow(0 0 8px rgba(255,215,0,.4));
-      animation: medalSpin 6s 2s ease-in-out infinite;
+    .podium-card.first {
+      background: linear-gradient(160deg, rgba(255,215,0,.12) 0%, rgba(255,215,0,.03) 100%);
+      border-color: rgba(255,215,0,.35);
+      padding-top: 36px;
     }
-    @keyframes medalSpin {
-      0%,100% { transform: rotate(-5deg) scale(1); }
-      50%      { transform: rotate(5deg) scale(1.08); }
+    .podium-card.first::before  { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+
+    .podium-card.second {
+      background: linear-gradient(160deg, rgba(192,207,224,.08) 0%, rgba(192,207,224,.02) 100%);
+      border-color: rgba(192,207,224,.25);
     }
+    .podium-card.second::before { background: linear-gradient(90deg, transparent, var(--silver), transparent); }
+
+    .podium-card.third {
+      background: linear-gradient(160deg, rgba(205,127,50,.1) 0%, rgba(205,127,50,.02) 100%);
+      border-color: rgba(205,127,50,.25);
+    }
+    .podium-card.third::before  { background: linear-gradient(90deg, transparent, var(--bronze), transparent); }
+
+    .medal { font-size: 36px; margin-bottom: 10px; }
 
     .podium-name {
       font-family: 'Anton', sans-serif;
-      font-size: 20px; letter-spacing: 1px;
-      text-transform: uppercase; color: #fff;
+      font-size: 22px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
     .podium-pts {
-      margin-top: 12px;
       font-family: 'Anton', sans-serif;
-      font-size: 44px; letter-spacing: 2px; line-height: 1;
+      font-size: 52px;
+      line-height: 1;
+      margin-top: 6px;
     }
-    .podium-card.first  .podium-pts { color: var(--gold); text-shadow: 0 0 20px rgba(255,215,0,.5); }
-    .podium-card.second .podium-pts { color: var(--silver); }
-    .podium-card.third  .podium-pts { color: var(--bronze); }
+    .podium-card.first  .podium-pts { color: var(--gold);   text-shadow: 0 0 24px rgba(255,215,0,.4); }
+    .podium-card.second .podium-pts { color: var(--silver); text-shadow: 0 0 20px rgba(192,207,224,.3); }
+    .podium-card.third  .podium-pts { color: var(--bronze); text-shadow: 0 0 20px rgba(205,127,50,.3); }
 
     .pts-label {
-      font-size: 10px; letter-spacing: 4px;
-      text-transform: uppercase; color: var(--muted);
-      display: block; margin-top: 2px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 3px;
+      margin-bottom: 18px;
     }
-    .podium-card .countries { justify-content: center; margin-top: 14px; }
 
-    .crown {
-      position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
-      font-size: 22px;
-      filter: drop-shadow(0 0 8px rgba(255,215,0,.7));
-      animation: crownFloat 2.5s ease-in-out infinite;
+    /* ── Country pills ── */
+    .countries { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .podium-card .countries { margin: 14px 0 0; }
+
+    .country-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 7px;
+      padding: 7px 13px 7px 9px;
+      font-size: 15px;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,.09);
+      background: rgba(255,255,255,.05);
+      transition: border-color .15s, background .15s;
     }
-    @keyframes crownFloat {
-      0%,100% { transform: translateX(-50%) translateY(0); }
-      50%      { transform: translateX(-50%) translateY(-5px); }
+    .country-pill:hover { background: rgba(255,255,255,.09); }
+    .country-pill .flag { font-size: 17px; }
+    .country-pill .cp-pts {
+      font-family: 'Anton', sans-serif;
+      font-size: 15px;
+      margin-left: 3px;
+      letter-spacing: 1px;
     }
+
+    .country-pill.heat-high { background: rgba(63,185,80,.12); border-color: rgba(63,185,80,.35); }
+    .country-pill.heat-high .cp-pts { color: var(--green); }
+    .country-pill.heat-mid  { background: rgba(210,153,34,.12); border-color: rgba(210,153,34,.35); }
+    .country-pill.heat-mid  .cp-pts { color: var(--yellow); }
+    .country-pill.heat-low  { background: rgba(248,81,73,.1);  border-color: rgba(248,81,73,.3); }
+    .country-pill.heat-low  .cp-pts { color: var(--red); }
+    .country-pill.heat-zero .cp-pts { color: var(--muted); }
+    .country-pill.on-fire::after { content: '🔥'; font-size: 12px; margin-left: 3px; }
 
     /* ── Table ── */
-    .table-wrap {
-      border-radius: 12px; overflow: hidden;
-      border: 1px solid var(--border);
-      background: var(--card);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    .table-section {
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255,255,255,.015);
     }
+
     table { width: 100%; border-collapse: collapse; }
-    thead {
-      background: linear-gradient(90deg, rgba(0,229,255,.06), rgba(255,215,0,.06));
-      border-bottom: 1px solid rgba(255,255,255,.1);
-    }
+
+    thead tr { border-bottom: 1px solid rgba(255,255,255,.07); }
     thead th {
-      font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
-      color: var(--muted); padding: 14px 22px; text-align: left; font-weight: 600;
+      padding: 14px 20px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      white-space: nowrap;
     }
     thead th.right { text-align: right; }
 
     tbody tr {
-      border-bottom: 1px solid var(--border);
-      transition: background .2s;
-      position: relative;
-      opacity: 0;
-      animation: slideInRow .5s ease forwards;
-      user-select: none;
-      -webkit-user-select: none;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      transition: background .15s;
     }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,.05); }
-    tbody tr:hover .rank-num { color: var(--gold); }
-    tbody tr:hover .name { color: var(--gold); }
+    tbody tr:hover { background: rgba(255,255,255,.04); }
 
-    tbody tr::before {
-      content: '';
-      position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-      background: linear-gradient(180deg, var(--cyan), var(--gold));
-      transform: scaleY(0);
-      transition: transform .2s;
-      border-radius: 0 2px 2px 0;
-    }
-    tbody tr:hover::before { transform: scaleY(1); }
-
-    td { padding: 15px 22px; vertical-align: top; }
+    td { padding: 16px 20px; vertical-align: top; }
 
     .rank-num {
-      font-family: 'Anton', sans-serif; font-size: 22px;
-      color: var(--muted); width: 44px; padding-top: 17px;
-      transition: color .2s; letter-spacing: 1px;
-    }
-    .name {
-      font-family: 'Anton', sans-serif; font-size: 18px;
-      letter-spacing: 1px; text-transform: uppercase;
-      color: #fff; transition: color .2s;
-    }
-    .points {
-      text-align: right; font-family: 'Anton', sans-serif;
-      font-size: 26px; color: var(--gold); letter-spacing: 1px;
-      white-space: nowrap; padding-top: 15px;
-      text-shadow: 0 0 12px rgba(255,215,0,.3);
-    }
-    .pts-unit {
-      font-family: 'Rajdhani', sans-serif; font-size: 11px;
-      color: var(--muted); margin-left: 3px; letter-spacing: 2px; text-shadow: none;
+      font-family: 'Anton', sans-serif;
+      font-size: 26px;
+      color: rgba(255,255,255,.15);
+      white-space: nowrap;
+      padding-top: 10px;
+      width: 48px;
     }
 
-    footer {
-      text-align: center; margin-top: 48px;
-      font-size: 11px; letter-spacing: 3px;
-      text-transform: uppercase; color: var(--muted);
+    .row-name {
+      font-family: 'Anton', sans-serif;
+      font-size: 22px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
     }
 
-    @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);} }
-    @keyframes fadeIn        { from{opacity:0;}to{opacity:1;} }
-    @keyframes riseUp        { from{opacity:0;transform:translateY(40px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);} }
-    @keyframes slideInRow    { from{opacity:0;transform:translateX(-24px);}to{opacity:1;transform:translateX(0);} }
+    .row-pts {
+      font-family: 'Anton', sans-serif;
+      font-size: 30px;
+      color: var(--gold);
+      text-align: right;
+      white-space: nowrap;
+      padding-top: 8px;
+    }
+    .row-pts .pts-unit {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-left: 2px;
+    }
 
-    @media (max-width: 580px) {
+    .table-countries { justify-content: flex-start; }
+
+    /* ── Entrance animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .podium-card.first  { animation-delay: .1s; }
+    .podium-card.second { animation-delay: .2s; }
+    .podium-card.third  { animation-delay: .3s; }
+
+    tbody tr {
+      animation: fadeUp .3s ease both;
+    }
+    tbody tr:nth-child(1)  { animation-delay: .35s; }
+    tbody tr:nth-child(2)  { animation-delay: .40s; }
+    tbody tr:nth-child(3)  { animation-delay: .45s; }
+    tbody tr:nth-child(4)  { animation-delay: .50s; }
+    tbody tr:nth-child(5)  { animation-delay: .55s; }
+    tbody tr:nth-child(6)  { animation-delay: .60s; }
+    tbody tr:nth-child(7)  { animation-delay: .65s; }
+    tbody tr:nth-child(8)  { animation-delay: .70s; }
+    tbody tr:nth-child(9)  { animation-delay: .75s; }
+
+    @keyframes goldGlow {
+      0%, 100% { box-shadow: 0 0 8px rgba(255,215,0,.1);  border-color: rgba(255,215,0,.35); }
+      50%       { box-shadow: 0 0 28px rgba(255,215,0,.35); border-color: rgba(255,215,0,.7);  }
+    }
+    @keyframes silverGlow {
+      0%, 100% { box-shadow: 0 0 8px rgba(192,207,224,.08); border-color: rgba(192,207,224,.25); }
+      50%       { box-shadow: 0 0 22px rgba(192,207,224,.3); border-color: rgba(192,207,224,.55); }
+    }
+    @keyframes bronzeGlow {
+      0%, 100% { box-shadow: 0 0 8px rgba(205,127,50,.08); border-color: rgba(205,127,50,.25); }
+      50%       { box-shadow: 0 0 22px rgba(205,127,50,.3); border-color: rgba(205,127,50,.55); }
+    }
+    @keyframes flameBob {
+      0%, 100% { transform: translateY(0) rotate(-4deg); }
+      50%       { transform: translateY(-4px) rotate(4deg); }
+    }
+
+    .podium-card.first  { animation: fadeUp .4s ease both, goldGlow   3s ease-in-out 1s infinite; }
+    .podium-card.second { animation: fadeUp .4s ease both, silverGlow 3.4s ease-in-out 1.2s infinite; }
+    .podium-card.third  { animation: fadeUp .4s ease both, bronzeGlow 3.8s ease-in-out 1.4s infinite; }
+
+    .country-pill.on-fire::after {
+      content: '🔥';
+      font-size: 14px;
+      margin-left: 3px;
+      display: inline-block;
+      animation: flameBob 1.2s ease-in-out infinite;
+    }
+
+    @media (max-width: 600px) {
       .podium { grid-template-columns: 1fr; align-items: stretch; }
-      .podium-card .countries { justify-content: flex-start; }
-      .crown { display: none; }
+      .podium-card.first { padding-top: 28px; }
     }
   </style>
 </head>
 <body>
-
-<canvas id="stars-canvas"></canvas>
-
+<canvas id="bg"></canvas>
 <div class="wrapper">
   <header>
-    <span class="trophy">🏆</span>
-    <div class="event-tag">Scuttery World Cup</div>
-    <h1>
-      <span class="line1">Raffle</span>
-      <span class="line2">Leaderboard</span>
-    </h1>
-    <div class="divider"></div>
+    <div class="trophy">🏆</div>
+    <h1><span>Leaderboard</span></h1>
   </header>
 
   <div class="podium" id="podium"></div>
 
-  <!-- Countdown to first match: Mexico vs South Africa, June 11 2026, 3pm ET -->
-  <div class="countdown-wrap" id="countdown-wrap">
-    <div class="countdown-label">
-      ⚽ Kickoff Countdown
-      <span class="match">Mexico vs South Africa · June 11</span>
-    </div>
-    <div class="countdown-digits">
-      <div class="cd-unit"><div class="cd-num" id="cd-days">00</div><div class="cd-lbl">Days</div></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-unit"><div class="cd-num" id="cd-hours">00</div><div class="cd-lbl">Hours</div></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-unit"><div class="cd-num" id="cd-mins">00</div><div class="cd-lbl">Mins</div></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-unit"><div class="cd-num" id="cd-secs">00</div><div class="cd-lbl">Secs</div></div>
-    </div>
-    <div class="cd-started">🟢 THE TOURNAMENT HAS STARTED!</div>
-  </div>
-
-  <div class="table-wrap" id="table-wrap" style="display:none">
+  <div class="table-section" id="table-section" style="display:none">
     <table>
       <thead>
         <tr>
@@ -498,13 +328,9 @@
     </table>
   </div>
 </div>
-
 <script>
-// =====================================================================
-//  EDIT THIS DATA — that's all you need to do!
-// =====================================================================
 const PLAYERS = [
-  { name: "Brendan",  countries: [{ flag:"🇧🇦",name:"Bosnia & Herzegovina",pts:0},{flag:"🇵🇦",name:"Panama",pts:0},{flag:"🇨🇴",name:"Colombia",pts:0},{flag:"🇩🇪",name:"Germany",pts:0}] },
+  { name: "Brendy",  countries: [{ flag:"🇧🇦",name:"Bosnia & Herzegovina",pts:0},{flag:"🇵🇦",name:"Panama",pts:0},{flag:"🇨🇴",name:"Colombia",pts:0},{flag:"🇩🇪",name:"Germany",pts:0}] },
   { name: "Camryn",   countries: [{ flag:"🇯🇴",name:"Jordan",pts:0},{flag:"🇩🇿",name:"Algeria",pts:0},{flag:"🇮🇷",name:"Iran",pts:0},{flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",name:"England",pts:0}] },
   { name: "Lochlann", countries: [{ flag:"🇹🇳",name:"Tunisia",pts:0},{flag:"🇦🇺",name:"Australia",pts:0},{flag:"🇺🇾",name:"Uruguay",pts:0},{flag:"🇧🇷",name:"Brazil",pts:0}] },
   { name: "Jack",     countries: [{ flag:"🇶🇦",name:"Qatar",pts:0},{flag:"🇵🇾",name:"Paraguay",pts:0},{flag:"🇯🇵",name:"Japan",pts:0},{flag:"🇫🇷",name:"France",pts:0}] },
@@ -515,101 +341,40 @@ const PLAYERS = [
   { name: "Alex",     countries: [{ flag:"🇸🇦",name:"Saudi Arabia",pts:0},{flag:"🇰🇷",name:"South Korea",pts:0},{flag:"🇸🇳",name:"Senegal",pts:0},{flag:"🇭🇷",name:"Croatia",pts:0}] },
   { name: "Oisin",    countries: [{ flag:"🇮🇶",name:"Iraq",pts:0},{flag:"🇨🇿",name:"Czechia",pts:0},{flag:"🇨🇭",name:"Switzerland",pts:0},{flag:"🇵🇹",name:"Portugal",pts:0}] },
   { name: "Conor",    countries: [{ flag:"🇿🇦",name:"South Africa",pts:0},{flag:"🇳🇴",name:"Norway",pts:0},{flag:"🇹🇷",name:"Turkey",pts:0},{flag:"🇧🇪",name:"Belgium",pts:0}] },
-  { name: "Derek",    countries: [{ flag:"🇬🇭",name:"Ghana",pts:0},{flag:"🇭🇹",name:"Haiti",pts:0},{flag:"🇨🇼",name:"Curaçao",pts:0},{flag:"🇳🇿",name:"New Zealand",pts:0}] },
+  { name: "Dek",    countries: [{ flag:"🇬🇭",name:"Ghana",pts:0},{flag:"🇭🇹",name:"Haiti",pts:0},{flag:"🇨🇼",name:"Curaçao",pts:0},{flag:"🇳🇿",name:"New Zealand",pts:0}] },
 ];
-// =====================================================================
-//  END OF DATA
-// =====================================================================
 
-// ── Star field (absolute, scrolls with page — fixes mobile jump) ──
-const canvas = document.getElementById('stars-canvas');
-const ctx    = canvas.getContext('2d');
-let stars    = [];
-
-function resizeCanvas() {
-  canvas.width  = document.body.scrollWidth;
-  canvas.height = document.body.scrollHeight;
-}
-
-function initStars() {
-  stars = [];
-  for (let i = 0; i < 220; i++) {
-    stars.push({
-      x:      Math.random() * canvas.width,
-      y:      Math.random() * canvas.height,
-      r:      Math.random() * 1.4 + .2,
-      alpha:  Math.random(),
-      dalpha: (Math.random() * .006 + .001) * (Math.random() < .5 ? 1 : -1),
-    });
-  }
-}
-
-function drawStars() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  stars.forEach(s => {
-    s.alpha += s.dalpha;
-    if (s.alpha > 1 || s.alpha < 0) s.dalpha *= -1;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(200,220,255,${Math.max(0, Math.min(1, s.alpha))})`;
-    ctx.fill();
-  });
-  requestAnimationFrame(drawStars);
-}
-
-resizeCanvas();
-initStars();
-drawStars();
-// Resize after fonts/content load
-window.addEventListener('load', () => { resizeCanvas(); initStars(); });
-
-// ── Helpers ──
 function totalPts(p) { return p.countries.reduce((s, c) => s + c.pts, 0); }
 
-// Find the single highest pts value across ALL players (for 🔥 badge)
 const globalMaxPts = Math.max(...PLAYERS.flatMap(p => p.countries.map(c => c.pts)));
 
-// Find the max pts within a single player's countries (for heat colouring)
 function pillsHTML(countries) {
+  countries = [...countries].sort((a, b) => b.pts - a.pts);
   const localMax = Math.max(...countries.map(c => c.pts));
-
   return countries.map(c => {
-    // Heat class
-    let heatClass;
-    if (c.pts === 0)              heatClass = 'heat-zero';
-    else if (localMax === 0)      heatClass = 'heat-zero';
-    else {
-      const ratio = c.pts / localMax;
-      if (ratio >= 0.66)      heatClass = 'heat-high';
-      else if (ratio >= 0.33) heatClass = 'heat-mid';
-      else                    heatClass = 'heat-low';
+    let heat;
+    if (c.pts === 0 || localMax === 0) {
+      heat = 'heat-zero';
+    } else {
+      const r = c.pts / localMax;
+      heat = r >= 0.66 ? 'heat-high' : r >= 0.33 ? 'heat-mid' : 'heat-low';
     }
-
-    // 🔥 only on the globally highest scoring country (ignore zeros)
-    const onFire = (globalMaxPts > 0 && c.pts === globalMaxPts) ? 'on-fire' : '';
-
-    return `<div class="country-pill ${heatClass} ${onFire}">
-      <span class="flag">${c.flag}</span>${c.name}
-      <span class="cp-pts">+${c.pts}</span>
-    </div>`;
+    const fire = (globalMaxPts > 0 && c.pts === globalMaxPts) ? 'on-fire' : '';
+    return `<div class="country-pill ${heat} ${fire}"><span class="flag">${c.flag}</span>${c.name}<span class="cp-pts">+${c.pts}</span></div>`;
   }).join('');
 }
 
 const sorted  = [...PLAYERS].sort((a, b) => totalPts(b) - totalPts(a));
-const medals  = ['🥇','🥈','🥉'];
-const classes = ['first','second','third'];
 const podium  = document.getElementById('podium');
 
 sorted.slice(0, 3).forEach((p, i) => {
-  const t     = totalPts(p);
-  const crown = i === 0 ? '<div class="crown">👑</div>' : '';
+  const t = totalPts(p);
   podium.innerHTML += `
-    <div class="podium-card ${classes[i]}">
-      ${crown}
-      <span class="medal">${medals[i]}</span>
+    <div class="podium-card ${['first','second','third'][i]}">
+      <div class="medal">${['🥇','🥈','🥉'][i]}</div>
       <div class="podium-name">${p.name}</div>
       <div class="podium-pts">${t}</div>
-      <span class="pts-label">points</span>
+      <div class="pts-label">points</div>
       <div class="countries">${pillsHTML(p.countries)}</div>
     </div>`;
 });
@@ -617,49 +382,73 @@ sorted.slice(0, 3).forEach((p, i) => {
 const tbody = document.getElementById('tbody');
 const rest  = sorted.slice(3);
 
-if (rest.length > 0) {
-  document.getElementById('table-wrap').style.display = '';
+if (rest.length) {
+  document.getElementById('table-section').style.display = '';
   rest.forEach((p, i) => {
-    const rank  = i + 4;
-    const t     = totalPts(p);
-    const delay = (1.1 + i * 0.07).toFixed(2);
     tbody.innerHTML += `
-      <tr style="animation-delay:${delay}s">
-        <td class="rank-num">${rank}</td>
+      <tr>
+        <td class="rank-num">${i + 4}</td>
         <td>
-          <div class="name">${p.name}</div>
-          <div class="countries">${pillsHTML(p.countries)}</div>
+          <div class="row-name">${p.name}</div>
+          <div class="countries table-countries">${pillsHTML(p.countries)}</div>
         </td>
-        <td class="points">${t}<span class="pts-unit"> pts</span></td>
+        <td class="row-pts">${totalPts(p)}<span class="pts-unit"> pts</span></td>
       </tr>`;
   });
 }
-// ── Countdown: Mexico vs South Africa, June 11 2026, 3pm ET (= 20:00 UTC) ──
-const KICKOFF = new Date('2026-06-11T20:00:00Z');
+</script>
+<script>
+(function () {
+  const canvas = document.getElementById('bg');
+  const ctx    = canvas.getContext('2d');
+  const COUNT  = 80;
+  let W, H, dots;
 
-function updateCountdown() {
-  const now  = new Date();
-  const diff = KICKOFF - now;
-  const wrap = document.getElementById('countdown-wrap');
-
-  if (diff <= 0) {
-    wrap.classList.add('started');
-    return;
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
   }
 
-  const days  = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-  const mins  = Math.floor((diff % 3600000)  / 60000);
-  const secs  = Math.floor((diff % 60000)    / 1000);
+  function makeDot() {
+    return {
+      x:     Math.random() * W,
+      y:     Math.random() * H,
+      r:     Math.random() * 1.2 + 0.4,
+      vx:    (Math.random() - 0.5) * 0.25,
+      vy:    (Math.random() - 0.5) * 0.25,
+      alpha: Math.random() * 0.35 + 0.05,
+      da:    (Math.random() - 0.5) * 0.004,
+    };
+  }
 
-  document.getElementById('cd-days').textContent  = String(days).padStart(2,'0');
-  document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
-  document.getElementById('cd-mins').textContent  = String(mins).padStart(2,'0');
-  document.getElementById('cd-secs').textContent  = String(secs).padStart(2,'0');
-}
+  function init() {
+    resize();
+    dots = Array.from({ length: COUNT }, makeDot);
+  }
 
-updateCountdown();
-setInterval(updateCountdown, 1000);
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (const d of dots) {
+      d.x += d.vx;
+      d.y += d.vy;
+      d.alpha += d.da;
+      if (d.alpha > 0.4 || d.alpha < 0.05) d.da *= -1;
+      if (d.x < 0) d.x = W;
+      if (d.x > W) d.x = 0;
+      if (d.y < 0) d.y = H;
+      if (d.y > H) d.y = 0;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${d.alpha.toFixed(3)})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  init();
+  draw();
+})();
 </script>
 </body>
 </html>
